@@ -1,23 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import ColorChanger from './Activity5/ColorChanger';
-import CounterApp from './Activity5/CounterApp';
+import ColorChanger from './Activity5/ColorChangerApp';  
+import CounterApp from './Activity5/CounterApp';  
 
-
-import Messenger from './MidAct1/Messenger';
-import Comment from './MidAct1/Comment';
+// Remove import "./index";
 
 export default function App() {
   return (
     <View style={styles.container}>
-
-  <Messenger/>
-  <Comment/>
-
-   <ColorChanger/>
-  <CounterApp/>
-
+      <ColorChanger />
+      <CounterApp />
       <StatusBar style="auto" />
     </View>
   );
@@ -26,6 +19,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
   },
 });
