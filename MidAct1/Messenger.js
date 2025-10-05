@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   SafeAreaView,
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +14,7 @@ import {
 export default function Messenger() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const flatListRef = useRef(null);
 
   const sendMessage = () => {
     if (text.trim() === "") return;
@@ -29,6 +30,7 @@ export default function Messenger() {
       >
         {/* Message list */}
         <FlatList
+          ref={flatListRef}
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
@@ -36,9 +38,12 @@ export default function Messenger() {
               <Text>{item.text}</Text>
             </View>
           )}
+          onContentSizeChange={() =>
+            flatListRef.current.scrollToEnd({ animated: true })
+          }
         />
 
-     
+        {/* Input row */}
         <View style={styles.inputRow}>
           <TextInput
             style={styles.input}
@@ -46,7 +51,9 @@ export default function Messenger() {
             value={text}
             onChangeText={setText}
           />
-          <Button title="Send" onPress={sendMessage} />
+          <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
+            <Text style={styles.sendText}>Send</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -63,7 +70,7 @@ const styles = StyleSheet.create({
     marginVertical: 4,
     backgroundColor: "#eee",
     borderRadius: 6,
-    alignSelf: "flex-end", 
+    alignSelf: "flex-start", // messages show on left for now
   },
   inputRow: {
     flexDirection: "row",
@@ -73,8 +80,16 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 6,
+    borderRadius: 20,
     padding: 8,
     marginRight: 8,
   },
+  sendBtn: {
+    backgroundColor: "#007bff",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    justifyContent: "center",
+  },
+  sendText: { color: "#fff", fontWeight: "600" },
 });

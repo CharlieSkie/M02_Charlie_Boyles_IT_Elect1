@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 
 export default function Comment() {
   const [comments, setComments] = useState([
@@ -9,10 +18,10 @@ export default function Comment() {
   const [newComment, setNewComment] = useState("");
 
   const addComment = () => {
-    if (newComment.trim().length === 0) return;
+    if (!newComment.trim()) return;
     setComments([
       ...comments,
-      { id: Date.now().toString(), text: newComment },
+      { id: Math.random().toString(), text: newComment },
     ]);
     setNewComment("");
   };
@@ -27,25 +36,37 @@ export default function Comment() {
   );
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={comments}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-      />
-
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="Write a comment..."
-          value={newComment}
-          onChangeText={setNewComment}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View style={styles.container}>
+        <FlatList
+          data={comments}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
         />
-        <TouchableOpacity style={styles.sendBtn} onPress={addComment}>
-          <Text style={styles.sendText}>Comment</Text>
-        </TouchableOpacity>
+
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            placeholder="Write a comment..."
+            value={newComment}
+            onChangeText={setNewComment}
+          />
+          <TouchableOpacity
+            style={[
+              styles.sendBtn,
+              !newComment.trim() && { opacity: 0.5 },
+            ]}
+            onPress={addComment}
+            disabled={!newComment.trim()}
+          >
+            <Text style={styles.sendText}>Comment</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
