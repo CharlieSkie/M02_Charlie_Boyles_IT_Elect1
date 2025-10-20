@@ -1,57 +1,72 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
-  SafeAreaView,
-  View,
   Text,
   TextInput,
-  TouchableOpacity,
   FlatList,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  View,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; 
 
 export default function Messenger() {
-  const [messages, setMessages] = useState([]);
-  const [text, setText] = useState("");
-  const flatListRef = useRef(null);
+  const [messages, setMessages] = useState([
+    { id: "1", text: "Hello!", sender: "me" },
+    { id: "2", text: "Hi! How are you?", sender: "friend" },
+  ]);
+  const [input, setInput] = useState("");
 
   const sendMessage = () => {
-    if (text.trim() === "") return;
-    setMessages((prev) => [...prev, { id: Date.now().toString(), text }]);
-    setText("");
+    if (input.trim() === "") return;
+    setMessages([
+      ...messages,
+      { id: Date.now().toString(), text: input, sender: "me" },
+    ]);
+    setInput("");
+  };
+
+  const getAvatar = (sender) => {
+    if (sender === "me") {
+      return require("../assets/lley.png");
+    } else {
+      return require("../assets/lleyy.png"); 
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
+    <SafeAreaView style={styles.container} edges={['left','right','bottom']}>
+      <KeyboardAvoidingView 
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* Message list */}
         <FlatList
-          ref={flatListRef}
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.message}>
-              <Text>{item.text}</Text>
+            <View
+              style={[
+                styles.messageContainer,
+                item.sender === "me" ? styles.myMessage : styles.friendMessage,
+              ]}
+            >
+              <Image source={getAvatar(item.sender)} style={styles.avatar} />
+              <Text style={styles.messageText}>{item.text}</Text>
             </View>
           )}
-          onContentSizeChange={() =>
-            flatListRef.current.scrollToEnd({ animated: true })
-          }
         />
 
-        {/* Input row */}
-        <View style={styles.inputRow}>
+        <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Type a message"
-            value={text}
-            onChangeText={setText}
+            value={input}
+            onChangeText={setInput}
+            placeholder="Type a message..."
           />
-          <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
+
+          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
             <Text style={styles.sendText}>Send</Text>
           </TouchableOpacity>
         </View>
@@ -63,17 +78,38 @@ export default function Messenger() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f8f8f8",
     padding: 10,
   },
-  message: {
-    padding: 10,
-    marginVertical: 4,
-    backgroundColor: "#eee",
-    borderRadius: 6,
-    alignSelf: "flex-start", // messages show on left for now
-  },
-  inputRow: {
+  messageContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  myMessage: {
+    alignSelf: "flex-end",
+  },
+  friendMessage: {
+    alignSelf: "flex-start",
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  messageText: {
+    fontSize: 16,
+    padding: 8,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+    maxWidth: "70%",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderColor: "#ccc",
+    padding: 8,
     alignItems: "center",
   },
   input: {
@@ -81,15 +117,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 20,
-    padding: 8,
+    paddingHorizontal: 12,
     marginRight: 8,
   },
-  sendBtn: {
+  sendButton: {
     backgroundColor: "#007bff",
-    paddingHorizontal: 15,
     paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 20,
-    justifyContent: "center",
   },
-  sendText: { color: "#fff", fontWeight: "600" },
+  sendText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });
